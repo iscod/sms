@@ -1,5 +1,7 @@
 <?php
 
+$phone = '170****';
+
 class Sms
 {
 
@@ -253,4 +255,4 @@ class Sms
 }
 
 $sms = new Sms();
-$sms->send('');
+$sms->send($phone);
