@@ -4,7 +4,6 @@ $phone = '170****';
 
 class Sms
 {
-
     private function _do_request($url, $params, $is_post = false, $headers = [])
     {
         if (!$is_post) {
@@ -202,6 +201,57 @@ class Sms
         return $this->_do_request($url, $params, true); 
     }
 
+    public function GuanNiHua($phone) {
+        $params = [
+            'verify_code' => '',
+            'verify_type' => '100',
+            'os' => 10,
+            'osv' => '10.3.1',
+            'phone' => $phone,
+            'client' => '67fa6691-3c60-0453-1e8e-50374506be69',
+            'channel' => 'wuq12',
+            'pname' => '201801050001',
+            'scene' =>  30,
+            'version' => '1.0'
+        ];
+
+        $url = 'https://guannihua.com/wap/verify_code';
+
+        return $this->_do_request($url, $params, true);
+    }
+
+    public function QiuShiBai($phone){
+        $params = [
+            'Tel' => $phone
+        ];
+
+        $url = "http://jing.qiushibai.cn/Api/System/CheckUserByTel?format=json";
+
+        $headers = [
+            'User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.0 Mobile/14E304 Safari/602.1'
+        ];
+        return $this->_do_request($url, $params, true, $headers);
+    }
+
+    public function MaoMiDk($phone) {
+        $params = [
+            'verify_code' => '',
+            'verify_type' => '100',
+            'os' => 10,
+            'osv' => '11.0',
+            'phone' => $phone,
+            'client' => '1b227a27-e267-c2b1-b04d-8425e7b1b643',
+            'channel' => 'qw6',
+            'pname' => '201903040000',
+            'scene' =>  30,
+            'version' => '1.0'
+        ];
+
+        $url = 'https://maomidk.com/maomidk/wap/verify_code';
+
+        return $this->_do_request($url, $params, true);
+    }
+
     public function send($phone)
     {
         $rs = $this->jiebangbang($phone);
@@ -250,6 +300,30 @@ class Sms
             echo "JinXiangHui send success\n";
         } else {
             echo "JinXiangHui send Error\n";
+        }
+
+        $rs = $this->GuanNiHua($phone);
+
+        if (isset($rs['result']) && $rs['result'] == '200') {
+            echo "GuanNiHua send success\n";
+        } else {
+            echo "GuanNiHua send Error\n";
+        }
+
+        $rs = $this->QiuShiBai($phone);
+
+         if (isset($rs['result']) && $rs['result'] == '200') {
+            echo "QiuShiBai send success\n";
+        } else {
+            echo "QiuShiBai send Error\n";
+        }
+
+         $rs = $this->MaoMiDk($phone);
+
+         if (isset($rs['result']) && $rs['result'] == '200') {
+            echo "MaoMiDk send success\n";
+        } else {
+            echo "MaoMiDk send Error\n";
         }
     }
 }
