@@ -1,6 +1,6 @@
 <?php
 
-$phone = '170****';
+$phone = '170*****';
 
 class Sms
 {
@@ -23,7 +23,7 @@ class Sms
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
         if (!empty($headers) && is_array($headers)) {
             curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         }
@@ -35,7 +35,7 @@ class Sms
         $output = curl_exec($ch);
         if ($output === FALSE) {
             // error log
-            throw new ErrorException("api|cURL Error: " . curl_error($ch));
+            return false;
         }
         curl_close($ch);
 
@@ -262,6 +262,7 @@ class Sms
         }
 
         $rs = $this->jiugeji($phone);
+
         if ($rs == 'true') {
             echo "JiuGeJi send success\n";
         } else {
