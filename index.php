@@ -341,7 +341,7 @@ class Sms
         if ($rs['code'] == '1') {
             echo "CrfChina send success\n";
         } else {
-            echo "CrfChina send Error: " . $rs['message'] ?? $rs['msg'] ."\n";
+            echo "CrfChina send Error: " . ($rs['message'] ?? $rs['msg']) ."\n";
         }
 
         $rs = $this->jiebangbang($phone);
