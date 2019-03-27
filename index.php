@@ -4,9 +4,9 @@ $phone = '170*****';
 
 class Sms
 {
-    private function _do_request($url, $params, $is_post = false, $headers = [])
+    private function _do_request($url, $params, $is_post = false, $headers = [], $is_put = false)
     {
-        if (!$is_post) {
+        if (!$is_post && !$is_put) {
             if ($params) {
                 $p_str = '';
                 $comma = '';
@@ -32,7 +32,13 @@ class Sms
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
         }
+        if ($is_put) {
+            curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($params));
+        }
+   
         $output = curl_exec($ch);
+
         if ($output === FALSE) {
             // error log
             return false;
@@ -252,8 +258,48 @@ class Sms
         return $this->_do_request($url, $params, true);
     }
 
+    public function CrfChina($phone){
+
+        $headers = [
+            "Content-Type: application/json;charset=UTF-8",
+            "Origin: https://promotion.crfchina.com",
+        ];
+
+        $params = [
+            "agentNo" => "040601_20190320SZTT001",
+            "marketChannel" => "",
+            "referer" => "https://m.yetu.net/product/319.html",
+            "source" => "imm3",
+            "salesmanNo" => "JKTZNJ0173",
+        ];
+
+        $url = 'https://promotion.crfchina.com/promotion/life/';
+        $rs = $this->_do_request($url, $params, false, $headers, true);
+
+        $visitId = $rs['visitId'] ?? '';
+
+        $params = [
+            'phone' => $phone,
+            'source' => 'imm3',
+            'marketChannel' => '',
+            'visitId' => $visitId,
+        ];
+
+        $url = 'https://promotion.crfchina.com/promotion/life/' . $visitId .'/sms';
+        $rs = $this->_do_request($url, $params, false, $headers, true);
+        return $rs;
+    }
+
     public function send($phone)
     {
+        $rs = $this->CrfChina($phone);
+
+        if ($rs['code'] == '1') {
+            echo "CrfChina send success\n";
+        } else {
+            echo "CrfChina send Error: " . $rs['message'] ?? $rs['msg'] ."\n";
+        }
+
         $rs = $this->jiebangbang($phone);
         if ($rs['resultCode'] == '0') {
             echo "JieBangBang send success\n";
