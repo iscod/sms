@@ -4,6 +4,17 @@ $phone = '170*****';
 
 class Sms
 {
+    private function Rand_IP(){
+        $ip2id= round(rand(600000, 2550000) / 10000); //第一种方法，直接生成
+        $ip3id= round(rand(600000, 2550000) / 10000);
+        $ip4id= round(rand(600000, 2550000) / 10000);
+        //下面是第二种方法，在以下数据中随机抽取
+        $arr_1 = array("218","218","66","66","218","218","60","60","202","204","66","66","66","59","61","60","222","221","66","59","60","60","66","218","218","62","63","64","66","66","122","211");
+        $randarr= mt_rand(0,count($arr_1)-1);
+        $ip1id = $arr_1[$randarr];
+        return $ip1id.".".$ip2id.".".$ip3id.".".$ip4id;
+    }
+
     private function _do_request($url, $params, $is_post = false, $headers = [], $is_put = false)
     {
         if (!$is_post && !$is_put) {
@@ -290,8 +301,41 @@ class Sms
         return $rs;
     }
 
+    public function yooJum($phone){
+
+        $params = [
+            'phone' => $phone,
+            'smsItemId' => '0',
+            'z' => 'fnA4eZ9DM05L9KzdgV59w3VEeEnekHeVL2CB78u52H72JbQ89AO4nOaPy5uQ5wJ8P-c3xeNv8cvdLKdzU9Ji',
+        ];
+
+        $ip = $this->Rand_IP();
+
+        $headers = [
+            "Origin: https://d.yoojum.com",
+            "Referer: https://d.yoojum.com/zhdk/wap/sdd4.0/index_fund.aspx?a=110517&b=0&c=2104073&d=1313&z=fnA4eZ9DM05L9KzdgV59w3VEeEnekHeVL2CB78u52H72JbQ89AO4nOaPy5uQ5wJ8P-c3xeNv8cvdLKdzU9Ji&amp;b=1",
+            "User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.0 Mobile/14E304 Safari/602.1",
+            'X-FORWARDED-FOR:'.$ip,
+            'CLIENT-IP:'.$ip
+
+        ];
+
+        $url = "https://d.yoojum.com/AjaxComm/SendCode.cspx";
+
+        $rs = $this->_do_request($url, $params, true, $headers);
+        return $rs;
+    }
+
     public function send($phone)
     {
+        $rs = $this->yooJum($phone);
+
+        if ($rs['Ret'] == '1') {
+            echo "yooJum send success\n";
+        } else {
+            echo "yooJum send Error: " . $rs['Msg'] ."\n";
+        }
+
         $rs = $this->CrfChina($phone);
 
         if ($rs['code'] == '1') {
