@@ -4,6 +4,10 @@ Make fun of your friends
 
 SMS bombing in the morning
 
+# Effective platform
+
+金享会,借帮帮,猫咪分期,借了吗,借点钱,救个急,信而富,~~古灵精贷~~,~~管你花~~
+
 ## config
 
 ```sh
