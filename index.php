@@ -218,6 +218,20 @@ class Sms
         return $this->_do_request($url, $params, true); 
     }
 
+    public function GuanNiHuaV2($phone) {
+        $params = [
+            'pname' => "201807240001",
+            'ptime' => '',
+            'vkey' => '',
+            'verify_type' => '',
+            'phone' => $phone,
+        ];
+
+        $url = "https://guannihua.com/wap/verify_code";
+
+        return $this->_do_request($url, $params, true);
+    }
+
     public function GuanNiHua($phone) {
         $params = [
             'verify_code' => '',
@@ -326,8 +340,30 @@ class Sms
         return $rs;
     }
 
+    public function CardLoan($phone){
+
+        $params = [
+            'mobile' => $phone,
+            'os' => 'h5',
+            '_srcid' => '100022644'
+        ];
+
+        $url = "https://cardloan.xiaoying.com/h5/user/check_register";
+
+        $rs = $this->_do_request($url, $params, true, $headers);
+        return $rs;
+    }
+
     public function send($phone)
     {
+        $rs = $this->CardLoan($phone);
+
+        if ($rs['errcode'] == '0') {
+            echo "CardLoan send success\n";
+        } else {
+            echo "CardLoan send Error: " . $rs['errstr'] ."\n";
+        }
+
         $rs = $this->yooJum($phone);
 
         if ($rs['Ret'] == '1') {
