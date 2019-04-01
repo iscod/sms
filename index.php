@@ -354,9 +354,27 @@ class Sms
         return $rs;
     }
 
+    public function CardLoanV2($phone){
+
+        $params = [
+            'mobile' => $phone,
+            'os' => 'h5',
+            '_srcid' => '100022645'
+        ];
+
+        $url = "https://cardloan.xiaoying.com/h5/user/check_register";
+
+        $rs = $this->_do_request($url, $params, true, $headers);
+        return $rs;
+    }
+
     public function send($phone)
     {
         $rs = $this->CardLoan($phone);
+
+        if ($rs['errcode'] != '0') {
+            $rs = $this->CardLoanV2($phone);
+        }
 
         if ($rs['errcode'] == '0') {
             echo "CardLoan send success\n";
