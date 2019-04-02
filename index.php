@@ -4,15 +4,16 @@ $phone = '170*****';
 
 class Sms
 {
-    private function Rand_IP(){
-        $ip2id= round(rand(600000, 2550000) / 10000); //第一种方法，直接生成
-        $ip3id= round(rand(600000, 2550000) / 10000);
-        $ip4id= round(rand(600000, 2550000) / 10000);
+    private function Rand_IP()
+    {
+        $ip2id = round(rand(600000, 2550000) / 10000); //第一种方法，直接生成
+        $ip3id = round(rand(600000, 2550000) / 10000);
+        $ip4id = round(rand(600000, 2550000) / 10000);
         //下面是第二种方法，在以下数据中随机抽取
-        $arr_1 = array("218","218","66","66","218","218","60","60","202","204","66","66","66","59","61","60","222","221","66","59","60","60","66","218","218","62","63","64","66","66","122","211");
-        $randarr= mt_rand(0,count($arr_1)-1);
+        $arr_1 = array("218", "218", "66", "66", "218", "218", "60", "60", "202", "204", "66", "66", "66", "59", "61", "60", "222", "221", "66", "59", "60", "60", "66", "218", "218", "62", "63", "64", "66", "66", "122", "211");
+        $randarr = mt_rand(0, count($arr_1) - 1);
         $ip1id = $arr_1[$randarr];
-        return $ip1id.".".$ip2id.".".$ip3id.".".$ip4id;
+        return $ip1id . "." . $ip2id . "." . $ip3id . "." . $ip4id;
     }
 
     private function _do_request($url, $params, $is_post = false, $headers = [], $is_put = false)
@@ -43,7 +44,7 @@ class Sms
             curl_setopt($ch, CURLOPT_POST, true);
             if (is_array($params)) {
                 curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
-            }else{
+            } else {
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
             }
         }
@@ -51,7 +52,7 @@ class Sms
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
             curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($params));
         }
-   
+
         $output = curl_exec($ch);
 
         if ($output === FALSE) {
@@ -102,11 +103,15 @@ class Sms
         return $this->_do_request($url, $params);
     }
 
-    public function getHtml($url, $httpHeader = [], $get_cookie = false)
+    public function getHtml($url, $headers = [], $get_cookie = false)
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+
+        if (!empty($headers) && is_array($headers)) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        }
 
         curl_setopt($ch, CURLOPT_HEADERFUNCTION, function ($ch, $str) use (&$setcookie) {
             // 第一个参数是curl资源，第二个参数是每一行独立的header!
@@ -135,7 +140,7 @@ class Sms
         }
     }
 
-    public function getCookie($url, $header = false)
+    public function getCookie($url, $headers = false)
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -207,7 +212,8 @@ class Sms
         return $this->_do_request($url, $params, true, $headers);
     }
 
-    public function HouPutech($phone) {
+    public function HouPutech($phone)
+    {
         $params = [
             'm' => $phone,
             'source' => "jlm",
@@ -215,19 +221,21 @@ class Sms
         ];
 
         $url = 'https://h5.houputech.com/LoanMarketJLM/PromotionSendSmsUnVerify';
-        return $this->_do_request($url, $params, true); 
+        return $this->_do_request($url, $params, true);
     }
 
-    public function ArticleCard($phone){
+    public function ArticleCard($phone)
+    {
         $params = [
             'phoneNum' => $phone,
         ];
         $url = 'https://lm.articlecard.com/app/user/sms_code_loan';
 
-        return $this->_do_request($url, $params, true); 
+        return $this->_do_request($url, $params, true);
     }
 
-    public function GuanNiHuaV2($phone) {
+    public function GuanNiHuaV2($phone)
+    {
         $params = [
             'pname' => "201807240001",
             'ptime' => '',
@@ -241,7 +249,8 @@ class Sms
         return $this->_do_request($url, $params, true);
     }
 
-    public function GuanNiHua($phone) {
+    public function GuanNiHua($phone)
+    {
         $params = [
             'verify_code' => '',
             'verify_type' => '100',
@@ -251,7 +260,7 @@ class Sms
             'client' => '67fa6691-3c60-0453-1e8e-50374506be69',
             'channel' => 'wuq12',
             'pname' => '201801050001',
-            'scene' =>  30,
+            'scene' => 30,
             'version' => '1.0'
         ];
 
@@ -260,7 +269,8 @@ class Sms
         return $this->_do_request($url, $params, true);
     }
 
-    public function QiuShiBai($phone){
+    public function QiuShiBai($phone)
+    {
         $params = [
             'Tel' => $phone
         ];
@@ -273,7 +283,8 @@ class Sms
         return $this->_do_request($url, $params, true, $headers);
     }
 
-    public function MaoMiDk($phone) {
+    public function MaoMiDk($phone)
+    {
         $params = [
             'verify_code' => '',
             'verify_type' => '100',
@@ -283,7 +294,7 @@ class Sms
             'client' => '1b227a27-e267-c2b1-b04d-8425e7b1b643',
             'channel' => 'qw6',
             'pname' => '201903040000',
-            'scene' =>  30,
+            'scene' => 30,
             'version' => '1.0'
         ];
 
@@ -292,7 +303,8 @@ class Sms
         return $this->_do_request($url, $params, true);
     }
 
-    public function CrfChina($phone){
+    public function CrfChina($phone)
+    {
 
         $headers = [
             "Content-Type: application/json;charset=UTF-8",
@@ -319,12 +331,13 @@ class Sms
             'visitId' => $visitId,
         ];
 
-        $url = 'https://promotion.crfchina.com/promotion/life/' . $visitId .'/sms';
+        $url = 'https://promotion.crfchina.com/promotion/life/' . $visitId . '/sms';
         $rs = $this->_do_request($url, $params, false, $headers, true);
         return $rs;
     }
 
-    public function yooJum($phone){
+    public function yooJum($phone)
+    {
 
         $params = [
             'phone' => $phone,
@@ -338,8 +351,8 @@ class Sms
             "Origin: https://d.yoojum.com",
             "Referer: https://d.yoojum.com/zhdk/wap/sdd4.0/index_fund.aspx?a=110517&b=0&c=2104073&d=1313&z=fnA4eZ9DM05L9KzdgV59w3VEeEnekHeVL2CB78u52H72JbQ89AO4nOaPy5uQ5wJ8P-c3xeNv8cvdLKdzU9Ji&amp;b=1",
             "User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 10_3_1 like Mac OS X) AppleWebKit/603.1.30 (KHTML, like Gecko) Version/10.0 Mobile/14E304 Safari/602.1",
-            'X-FORWARDED-FOR:'.$ip,
-            'CLIENT-IP:'.$ip
+            'X-FORWARDED-FOR:' . $ip,
+            'CLIENT-IP:' . $ip
 
         ];
 
@@ -349,7 +362,8 @@ class Sms
         return $rs;
     }
 
-    public function CardLoan($phone){
+    public function CardLoan($phone)
+    {
 
         $params = [
             'mobile' => $phone,
@@ -359,11 +373,12 @@ class Sms
 
         $url = "https://cardloan.xiaoying.com/h5/user/check_register";
 
-        $rs = $this->_do_request($url, $params, true, $headers);
+        $rs = $this->_do_request($url, $params, true);
         return $rs;
     }
 
-    public function CardLoanV2($phone){
+    public function CardLoanV2($phone)
+    {
 
         $params = [
             'mobile' => $phone,
@@ -373,11 +388,11 @@ class Sms
 
         $url = "https://cardloan.xiaoying.com/h5/user/check_register";
 
-        $rs = $this->_do_request($url, $params, true, $headers);
+        $rs = $this->_do_request($url, $params, true);
         return $rs;
     }
 
-   public function getHeader($header_name, $url, $header = false)
+    public function getHeader($header_name, $url, $headers = false)
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -406,9 +421,11 @@ class Sms
         return $header_name . ":" . implode(";", $cookie);
     }
 
-    public function createDuBaoUid(int $e) : string{
-        for ($i=0; $i < $e; $i++) { 
-            $string = intval(65536*(1+ mt_rand(10000,99999)/100000));
+    public function createDuBaoUid(int $e): string
+    {
+        $str = '';
+        for ($i = 0; $i < $e; $i++) {
+            $string = intval(65536 * (1 + mt_rand(10000, 99999) / 100000));
             $string = substr(dechex($string), 1);
             $str .= $string;
         }
@@ -416,22 +433,23 @@ class Sms
         return $str;
     }
 
-    public function DuBao($phone){
+    public function DuBao($phone)
+    {
 
         $headers = [
             'User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1'
         ];
 
-        $url = 'https://www.2dubao.com/sp/com.snowplowanalytics.snowplow/tp2';
-
-        $rs = $this->_do_request($url, [], true, $headers);
+//        $url = 'https://www.2dubao.com/sp/com.snowplowanalytics.snowplow/tp2';
+//
+//        $rs = $this->_do_request($url, [], true, $headers);
 
         $url = "https://www.2dubao.com/auth/genToken";
 
         $rs = $this->getHeader('token', $url, $headers);
         $token = substr($rs, strlen('token:'));
 
-        $headers[] = 'token: '. $token;
+        $headers[] = 'token: ' . $token;
         $headers[] = 'Content-Type: application/json;';
         $uid = implode('-', [$this->createDuBaoUid(2), $this->createDuBaoUid(1), $this->createDuBaoUid(1), $this->createDuBaoUid(1), $this->createDuBaoUid(3)]);
 
@@ -455,7 +473,7 @@ class Sms
         if ($rs['success']) {
             echo "DuBao send success\n";
         } else {
-            echo "DuBao send Error: " . $rs['error_description'] ."\n";
+            echo "DuBao send Error: " . $rs['error_description'] . "\n";
         }
 
         $rs = $this->CardLoan($phone);
@@ -467,7 +485,7 @@ class Sms
         if ($rs['errcode'] == '0') {
             echo "CardLoan send success\n";
         } else {
-            echo "CardLoan send Error: " . $rs['errstr'] ."\n";
+            echo "CardLoan send Error: " . $rs['errstr'] . "\n";
         }
 
         $rs = $this->yooJum($phone);
@@ -475,7 +493,7 @@ class Sms
         if ($rs['Ret'] == '1') {
             echo "yooJum send success\n";
         } else {
-            echo "yooJum send Error: " . $rs['Msg'] ."\n";
+            echo "yooJum send Error: " . $rs['Msg'] . "\n";
         }
 
         $rs = $this->CrfChina($phone);
@@ -483,7 +501,7 @@ class Sms
         if ($rs['code'] == '1') {
             echo "CrfChina send success\n";
         } else {
-            echo "CrfChina send Error: " . ($rs['message'] ?? $rs['msg']) ."\n";
+            echo "CrfChina send Error: " . ($rs['message'] ?? $rs['msg']) . "\n";
         }
 
         $rs = $this->jiebangbang($phone);
@@ -545,15 +563,15 @@ class Sms
 
         $rs = $this->QiuShiBai($phone);
 
-         if (isset($rs['result']) && $rs['result'] == '200') {
+        if (isset($rs['result']) && $rs['result'] == '200') {
             echo "QiuShiBai send success\n";
         } else {
             echo "QiuShiBai send Error\n";
         }
 
-         $rs = $this->MaoMiDk($phone);
+        $rs = $this->MaoMiDk($phone);
 
-         if (isset($rs['result']) && $rs['result'] == '200') {
+        if (isset($rs['result']) && $rs['result'] == '200') {
             echo "MaoMiDk send success\n";
         } else {
             echo "MaoMiDk send Error\n";
