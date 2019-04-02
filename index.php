@@ -41,7 +41,11 @@ class Sms
 
         if ($is_post) {
             curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+            if (is_array($params)) {
+                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params));
+            }else{
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
+            }
         }
         if ($is_put) {
             curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
@@ -56,7 +60,7 @@ class Sms
         }
         curl_close($ch);
 
-        $rs = json_decode($output, true);
+        $rs = json_decode($output, true) ?? $output;
 
         return $rs;
     }
@@ -131,11 +135,16 @@ class Sms
         }
     }
 
-    public function getCookie($url)
+    public function getCookie($url, $header = false)
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_NOBODY, true);
+
+        if (!empty($headers) && is_array($headers)) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        }
+
         curl_setopt($ch, CURLOPT_HEADERFUNCTION, function ($ch, $str) use (&$setcookie) {
             // 第一个参数是curl资源，第二个参数是每一行独立的header!
             list ($name, $value) = array_map('trim', explode(':', $str, 2));
@@ -368,8 +377,87 @@ class Sms
         return $rs;
     }
 
+   public function getHeader($header_name, $url, $header = false)
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_NOBODY, true);
+
+        if (!empty($headers) && is_array($headers)) {
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        }
+
+        curl_setopt($ch, CURLOPT_HEADERFUNCTION, function ($ch, $str) use (&$setcookie, $header_name) {
+            // 第一个参数是curl资源，第二个参数是每一行独立的header!
+            list ($name, $value) = array_map('trim', explode(':', $str, 2));
+            $name = strtolower($name);
+            if ($header_name == $name) {
+                $setcookie[] = $value;
+            }
+            return strlen($str);
+        });
+        curl_exec($ch);
+        curl_close($ch);
+        $cookie = array();
+        foreach ($setcookie as $c) {
+            $tmp = explode(";", $c);
+            $cookie[] = $tmp[0];
+        }
+        return $header_name . ":" . implode(";", $cookie);
+    }
+
+    public function createDuBaoUid(int $e) : string{
+        for ($i=0; $i < $e; $i++) { 
+            $string = intval(65536*(1+ mt_rand(10000,99999)/100000));
+            $string = substr(dechex($string), 1);
+            $str .= $string;
+        }
+
+        return $str;
+    }
+
+    public function DuBao($phone){
+
+        $headers = [
+            'User-Agent: Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1'
+        ];
+
+        $url = 'https://www.2dubao.com/sp/com.snowplowanalytics.snowplow/tp2';
+
+        $rs = $this->_do_request($url, [], true, $headers);
+
+        $url = "https://www.2dubao.com/auth/genToken";
+
+        $rs = $this->getHeader('token', $url, $headers);
+        $token = substr($rs, strlen('token:'));
+
+        $headers[] = 'token: '. $token;
+        $headers[] = 'Content-Type: application/json;';
+        $uid = implode('-', [$this->createDuBaoUid(2), $this->createDuBaoUid(1), $this->createDuBaoUid(1), $this->createDuBaoUid(1), $this->createDuBaoUid(3)]);
+
+        $params = [
+            'bizType' => 'login',
+            'businessGroup' => 'BGMMCM',
+            'deviceID' => $uid,
+            'phoneNum' => $phone,
+        ];
+
+        $params = json_encode($params);
+        $url = "https://www.2dubao.com/auth/pass/sendLoginPass";
+
+        $rs = $this->_do_request($url, $params, true, $headers);
+        return $rs;
+    }
+
     public function send($phone)
     {
+        $rs = $this->DuBao($phone);
+        if ($rs['success']) {
+            echo "DuBao send success\n";
+        } else {
+            echo "DuBao send Error: " . $rs['error_description'] ."\n";
+        }
+
         $rs = $this->CardLoan($phone);
 
         if ($rs['errcode'] != '0') {
