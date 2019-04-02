@@ -1,0 +1,10 @@
+language: php
+php:
+  - 7.0
+  - 7.1
+  - 7.2
+
+before_script:
+  - sh -c "cat index.php |sed 's/170\*\*\*\*\*/'$PHONE'/g' > test.php >/dev/null 2>&1";
+
+script: php test.php
